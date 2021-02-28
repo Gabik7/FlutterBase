@@ -38,6 +38,8 @@ class LoginForm extends StatelessWidget {
               _GoogleLoginButton(),
               const SizedBox(height: 8.0),
               _FacebookLoginButton(),
+              const SizedBox(height: 8.0),
+              _AppleLoginButton(),
               const SizedBox(height: 4.0),
               _SignUpButton(),
             ],
@@ -145,6 +147,23 @@ class _FacebookLoginButton extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
       icon: const Icon(FontAwesomeIcons.facebook, color: Colors.white),
       color: Colors.blue,
+      onPressed: () => context.read<LoginCubit>().logInWithFacebook(),
+    );
+  }
+}
+
+class _AppleLoginButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return RaisedButton.icon(
+      key: const Key('loginForm_appleLogin_raisedButton'),
+      label: const Text(
+        'SIGN IN WITH APPLE',
+        style: TextStyle(color: Colors.white),
+      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30.0)),
+      icon: const Icon(FontAwesomeIcons.apple, color: Colors.white),
+      color: Colors.black,
       onPressed: () => context.read<LoginCubit>().logInWithFacebook(),
     );
   }

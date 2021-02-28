@@ -4,8 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:meta/meta.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../models/user/User.dart';
+import '../helpers/helpers.dart';
 
 /// Thrown if during the sign up process if a failure occurs.
 class SignUpFailure implements Exception {}
@@ -18,6 +20,9 @@ class LogInWithGoogleFailure implements Exception {}
 
 /// Thrown during the sign in with facebook process if a failure occurs.
 class LogInWithFacebookFailure implements Exception {}
+
+/// Thrown during the sign in with appke process if a failure occurs.
+class LogInWithAppleFailure implements Exception {}
 
 /// Thrown during the logout process if a failure occurs.
 class LogOutFailure implements Exception {}
@@ -94,6 +99,31 @@ class AuthenticationRepository {
       return await _firebaseAuth.signInWithCredential(facebookAuthCredential);
     } on Exception {
       throw LogInWithFacebookFailure();
+    }
+  }
+
+  Future<void> logInWithApple() async {
+    try {
+      final rawNonce = generateNonce();
+      final nonce = sha256ofString(rawNonce);
+
+      final appleCredential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        nonce: nonce,
+      );
+
+      final oauthCredential =
+          firebase_auth.OAuthProvider("apple.com").credential(
+        idToken: appleCredential.identityToken,
+        rawNonce: rawNonce,
+      );
+
+      return await _firebaseAuth.signInWithCredential(oauthCredential);
+    } on Exception {
+      throw LogInWithAppleFailure();
     }
   }
 
